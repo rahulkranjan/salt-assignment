@@ -160,7 +160,7 @@ CSRF_TRUSTED_ORIGINS = [
     'https://localhost:3000',
     'https://localhost:3001',
     'https://web-production-df525.up.railway.app',
-    
+    'https://beamish-brioche-44e6ed.netlify.app'
     ]
 
 CORS_ORIGIN_WHITELIST = [
@@ -168,6 +168,7 @@ CORS_ORIGIN_WHITELIST = [
     'https://localhost:3000',
     'https://localhost:3001',
     'https://web-production-df525.up.railway.app',
+    'https://beamish-brioche-44e6ed.netlify.app'
 ]
 
 SIMPLE_JWT = {
