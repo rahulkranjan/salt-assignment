@@ -31,15 +31,24 @@ class UserList(ListAPIView):
     renderer_classes = [JSONRenderer]
 
     def get_queryset(self):
-        queryset = User.objects.filter().order_by('-date_joined')
+        queryset = User.objects.filter(id = self.request.user.id).order_by('-date_joined')
         return queryset
 
     def post(self, request, format=None):
-        serializer = UserSerializerDetailed(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        data = request.data
+        user = User.objects.all()
+        check_contact = user.filter(contact = data.get('contact')).exists()
+        check_email = user.filter(email = data.get('email')).exists()
+        if check_contact or check_email:
+            if check_contact == True:
+                return Response({'error':'Contact already exists'}, status=status.HTTP_302_FOUND)
+            return Response('Email already exists', status=status.HTTP_302_FOUND)
+        else:
+            serializer = UserSerializerDetailed(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserDetailed(APIView):
