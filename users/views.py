@@ -31,13 +31,11 @@ class UserList(ListAPIView):
     renderer_classes = [JSONRenderer]
 
     def get_queryset(self):
-        queryset = User.objects.filter(
-            id=self.request.user.id).order_by('-date_joined')
+        queryset = User.objects.filter().order_by('-date_joined')
         return queryset
 
     def post(self, request, format=None):
-        serializer = UserCreateSerializer(data=request.data)
-        # dashboard(request.data)
+        serializer = UserSerializerDetailed(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
