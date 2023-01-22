@@ -159,6 +159,7 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
     'https://localhost:3000',
     'https://localhost:3001',
+    'https://web-production-df525.up.railway.app',
     'https://beamish-brioche-44e6ed.netlify.app'
     ]
 
@@ -166,6 +167,7 @@ CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
     'https://localhost:3000',
     'https://localhost:3001',
+    'https://web-production-df525.up.railway.app',
     'https://beamish-brioche-44e6ed.netlify.app'
 ]
 
