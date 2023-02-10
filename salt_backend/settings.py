@@ -87,12 +87,8 @@ WSGI_APPLICATION = 'salt_backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'railway',
-        'USER': 'postgres',
-        'PASSWORD': 'Z5o8gprMxhOvKDK3yPFW',
-        'HOST': 'containers-us-west-158.railway.app',
-        'PORT': '7940',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
