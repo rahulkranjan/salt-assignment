@@ -199,3 +199,5 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
+GOOGLE_OAUTH2_CLIENT_ID = '7065572801-lr4ffnb8vgtu2lee1jo2a9vbbb4ntqvk.apps.googleusercontent.com'
+GOOGLE_OAUTH2_CLIENT_SECRET = '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'
