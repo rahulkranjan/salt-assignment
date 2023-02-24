@@ -149,20 +149,19 @@ class GoogleAuthLocal(APIView):
         data = GmeetConfig.objects.get(tutor_id=1)
         if data.credentials is not None:
             client_secret = json.loads(data.credentials)
-
+        import pdb
+        pdb.set_trace()
         flow = flow = InstalledAppFlow.from_client_config(
                 client_secret,
             scopes=[
                 "https://www.googleapis.com/auth/calendar",
             ],
-            redirect_uri="http://127.0.0.1:8000/apiV1/callback")
+            redirect_uri="http://127.0.0.1:8000/apiV1/callback/")
 
         flow.run_local_server()
 
         return Response("Done")
         # {'name': '...',  'email': '...', ...}
-
-# http://localhost:8080/?state=QNMDZyScTmic91V7lEJXE11noB3j8u&code=4/0ARtbsJoifTqsE2Be_EaJzmk13r-whLZgbyYaalBpAnCrb9LonNwWYdRCbbGozp_lw0tEcA&scope=email%20profile%20https://www.googleapis.com/auth/userinfo.profile%20https://www.googleapis.com/auth/userinfo.email%20openid&authuser=3&hd=materialdepot.in&prompt=consent
 
 class GoogleAuthCallback(APIView):
     permission_classes = (permissions.AllowAny, )
@@ -178,5 +177,6 @@ class GoogleAuthCallback(APIView):
             ],
             redirect_uri="http://127.0.0.1:8000/apiV1/callback")
         flow.fetch_token(code=code)
+        print(code)
 
         return Response("Done final")
