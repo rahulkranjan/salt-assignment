@@ -85,3 +85,19 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     class Meta:
         ordering = ['-date_joined']
+
+
+class GmeetConfig(models.Model):
+    tutor_id = models.PositiveIntegerField(null=True, blank=True)
+    credentials = models.TextField( null=True, blank=True)
+    token = models.TextField( null=True, blank=True)
+    is_deleted = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "gmeet_config_data"
+        ordering = ["-pk"]
+        index_together = [
+            ("tutor_id", "is_deleted"),
+        ]
