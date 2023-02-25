@@ -11,7 +11,7 @@ import django
 import json
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import filters, permissions, status
+
 from .models import GmeetConfig
 
 sys.path.append("../..")
@@ -39,11 +39,11 @@ class GoogleCalendar:
     def get_credentials(self):
         data = GmeetConfig.objects.get(tutor_id=self.tutor)
         if data.credentials is not None:
-            client_secret = json.loads(data.credentials)
+            client_secret = eval(data.credentials)
 
-        
-        if data.token != "":
-            token = json.loads(data.token)
+        # if data.token != "" or data.token is not None:
+        if data.token:
+            token = data.token
             token = Credentials.from_authorized_user_info(token, self.scopes)
         else:
             token = None
@@ -53,16 +53,14 @@ class GoogleCalendar:
             if token and token.expired and token.refresh_token:
                 token.refresh(Request())
             else:
-                flow = InstalledAppFlow.from_client_config(
-                    client_secret,
-                    scopes=self.scopes,
-                    redirect_uri="http://127.0.0.1:8000/apiV1/callback"
-                    )
-                token = flow.run_local_server()
+                flow = InstalledAppFlow.from_client_config(client_secret, scopes=self.scopes)
+                token = flow.run_local_server(port=0)
+            
             data.token = token.to_json()
             data.save()
-        
+
         return token
+        
         
 
 
@@ -95,9 +93,8 @@ class GoogleCalendar:
         }
         result = service.events().insert(calendarId=calendar_id, body=event, conferenceDataVersion=1).execute()
         return result
-    
 
-class Gmeet(APIView):
+class gmeet(APIView):
     def get(self, request, format=None):
         tutor_id = 1
         start_time = datetime(2023, 2, 10, 13, 36, 0)
@@ -106,77 +103,67 @@ class Gmeet(APIView):
         location = "xyz"
         description = "test"
         attendees = [
-                {
-                    "email": "kjrahul21@gmail.com",
-
-                },
             ]
         calendar = GoogleCalendar(tutor_id, start_time, end_time,summary, location,description, attendees)
         result = calendar.create_event(start_time,end_time)
-        return Response(result['hangoutLink'])
+        return Response(result)
 
 
-
-def get_credentials(self):
-        data = GmeetConfig.objects.get(tutor_id=self.tutor)
-        if data.credentials is not None:
-            client_secret = json.loads(data.credentials)
-
-        
-        # if data.token != "":
-        #     token = json.loads(data.token)
-        #     token = Credentials.from_authorized_user_info(token, self.scopes)
-        # else:
-        #     token = None
-        
-        # # If there are no (valid) credentials available, let the user log in.
-        # if not token or not token.valid:
-        #     if token and token.expired and token.refresh_token:
-        #         token.refresh(Request())
-        #     else:
-        flow = InstalledAppFlow.from_client_config(client_secret, scopes=self.scopes)
-        creds = flow.run_console()
-
-        return creds
-        
-        # return token
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import Flow
+from django.urls import reverse
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.exceptions import AuthenticationFailed
 
 
-class GoogleAuthLocal(APIView):
-    permission_classes = (permissions.AllowAny, )
-
+class GoogleAuthView(APIView):
     def get(self, request, format=None):
-        data = GmeetConfig.objects.get(tutor_id=1)
-        if data.credentials is not None:
-            client_secret = json.loads(data.credentials)
-        import pdb
-        pdb.set_trace()
-        flow = flow = InstalledAppFlow.from_client_config(
-                client_secret,
-            scopes=[
-                "https://www.googleapis.com/auth/calendar",
-            ],
-            redirect_uri="http://127.0.0.1:8000/apiV1/callback/")
+        # Set up the Google OAuth2 flow
+        flow = InstalledAppFlow.from_client_secrets_file(
+            'cred2.json',
+            scopes=['https://www.googleapis.com/auth/calendar'],
+            redirect_uri=request.build_absolute_uri(reverse('google_oauth_callback')),
+        )
 
-        flow.run_local_server()
+        authorization_url, state = flow.authorization_url(
+            access_type='offline',
+            prompt='consent',
+        )
 
-        return Response("Done")
-        # {'name': '...',  'email': '...', ...}
+        # Store the state parameter in the session
+        request.session['google_oauth_state'] = state
 
-class GoogleAuthCallback(APIView):
-    permission_classes = (permissions.AllowAny, )
+        # Redirect the user to the Google OAuth consent screen
+        return Response({'url': authorization_url})
+    
+
+
+
+class GoogleCallbackView(APIView):
     def get(self, request, format=None):
-        data = GmeetConfig.objects.get(tutor_id=1)
-        if data.credentials is not None:
-            client_secret = json.loads(data.credentials)
+        # Check the state parameter to prevent CSRF attacks
         code = self.request.query_params.get('code', None)
-        flow = flow = InstalledAppFlow.from_client_config(
-                client_secret,
-            scopes=[
-                "https://www.googleapis.com/auth/calendar",
-            ],
-            redirect_uri="http://127.0.0.1:8000/apiV1/callback")
-        flow.fetch_token(code=code)
-        print(code)
 
-        return Response("Done final")
+        # Exchange the authorization code for an access token
+        flow = InstalledAppFlow.from_client_secrets_file(
+            'cred2.json',
+            scopes=['https://www.googleapis.com/auth/calendar'],
+            redirect_uri=request.build_absolute_uri(reverse('google_oauth_callback')),
+        )
+
+        try:
+            data = flow.fetch_token(code=code)
+            print(data.json())
+
+        except Exception as e:
+            raise AuthenticationFailed(str(e))
+
+        # Store the access token in the session
+        credentials = data
+        admin = GmeetConfig.objects.get(tutor_id=1)
+        admin.token = credentials
+        admin.save()
+        
+
+        return Response({'message': 'Authentication successful'})
