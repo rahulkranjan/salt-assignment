@@ -7,11 +7,10 @@ urlpatterns = [
     path('current-user/', Current_User),
     path('user/', UserList.as_view()),
     path('user/<pk>/', UserDetailed.as_view()),
-    path('gmeet/', GoogleAuthView.as_view(), name='google_oauth'),
-    path('callback/', GoogleCallbackView.as_view(), name='google_oauth_callback'),
-    path('meet/', gmeet.as_view()),
-    # path('GoogleAuthLocal/', GoogleAuthLocal.as_view()),
-    # path('callback/', GoogleAuthCallback.as_view()),
+    # path('apicall/', callApi.as_view()),
+    path('create-meet/', CreateMeet.as_view()),
+    path('google-oauth/', GoogleAuthView.as_view(), name='google_oauth'),
+    path('callback/', GoogleAuthCallback.as_view(), name='google_oauth_callback'),
 
-
+    # path('create-event/', create_event),
 ]

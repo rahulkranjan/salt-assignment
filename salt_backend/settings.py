@@ -30,7 +30,8 @@ DEBUG = True
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
-    "web-production-df525.up.railway.app"
+    "web-production-df525.up.railway.app",
+    
 ]
 
 
@@ -48,6 +49,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_filters',
     'users',
+    'sslserver',
 ]
 
 MIDDLEWARE = [
@@ -201,3 +203,20 @@ SIMPLE_JWT = {
 
 GOOGLE_OAUTH2_CLIENT_ID = '7065572801-lr4ffnb8vgtu2lee1jo2a9vbbb4ntqvk.apps.googleusercontent.com'
 GOOGLE_OAUTH2_CLIENT_SECRET = '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'
+
+# Enable SSL/TLS
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = True
+
+# SSL/TLS settings
+SECURE_HSTS_SECONDS = 31536000  # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+
+# SSL/TLS certificate settings
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_CERTIFICATE = "C:/Users/kjrah/Downloads/pem/cert.pem"
+SECURE_SSL_KEY = "C:/Users/kjrah/Downloads/pem/key.pem"
