@@ -149,7 +149,7 @@ class GoogleAuthView(APIView):
         flow = InstalledAppFlow.from_client_config(
             client_secret,
             scopes=['https://www.googleapis.com/auth/calendar'],
-            redirect_uri=request.build_absolute_uri(reverse('google_oauth_callback')),
+            redirect_uri='http://web-production-df525.up.railway.app/apiV1/callback/',
         )
         authorization_url, state = flow.authorization_url(
             access_type='offline',
@@ -160,7 +160,7 @@ class GoogleAuthView(APIView):
 
         # Redirect the user to the Google OAuth consent screen
         return Response({'url': authorization_url})
-    
+
 class GoogleAuthCallback(APIView):
     permission_classes = (permissions.AllowAny, )
     def get(self, request, format=None):
@@ -172,7 +172,7 @@ class GoogleAuthCallback(APIView):
             scopes=[
                 'https://www.googleapis.com/auth/calendar'
             ],
-            redirect_uri=request.build_absolute_uri(reverse('google_oauth_callback')),)
+            redirect_uri='http://web-production-df525.up.railway.app/apiV1/callback/',)
         access_token = flow.fetch_token(code=code)
 
         final = {
