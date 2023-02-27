@@ -140,6 +140,8 @@ class CreateMeet(APIView):
 
 from rest_framework import filters, permissions, status
 from django.urls import reverse
+
+uri = "https://web-production-df525.up.railway.app/apiV1/callback/"
 class GoogleAuthView(APIView):
     permission_classes = (permissions.AllowAny, )
     def get(self, request, format=None):
@@ -149,7 +151,7 @@ class GoogleAuthView(APIView):
         flow = InstalledAppFlow.from_client_config(
             client_secret,
             scopes=['https://www.googleapis.com/auth/calendar'],
-            redirect_uri='http://web-production-df525.up.railway.app/apiV1/callback/',
+            redirect_uri=uri,
         )
         authorization_url, state = flow.authorization_url(
             access_type='offline',
@@ -172,7 +174,7 @@ class GoogleAuthCallback(APIView):
             scopes=[
                 'https://www.googleapis.com/auth/calendar'
             ],
-            redirect_uri='http://web-production-df525.up.railway.app/apiV1/callback/',)
+            redirect_uri=uri,)
         access_token = flow.fetch_token(code=code)
 
         final = {
