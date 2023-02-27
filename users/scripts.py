@@ -187,77 +187,8 @@ class GoogleAuthCallback(APIView):
             "expiry_date": datetime.fromtimestamp(access_token['expires_at'])
 
         }
-
-        return Response({'message': 'Authentication successful', 'access_token': final})
+        data.token = final
+        data.save()
+        from django.shortcuts import render
+        return Response(render(request, 'template/thankyou.html'))
     
-
-# from django.conf import settings
-# from django.shortcuts import render
-# from rest_framework.decorators import api_view
-# from rest_framework.response import Response
-# from google.oauth2.credentials import Credentials
-# from googleapiclient.errors import HttpError
-# from googleapiclient.discovery import build
-# from datetime import datetime, timedelta
-# from google_auth_oauthlib.flow import Flow
-
-# # Set the required OAuth scopes
-# SCOPES = ['https://www.googleapis.com/auth/calendar']
-
-# # Set the path to your credentials JSON file
-# credentials_file = 'newcred.json'
-
-# # Create a flow to handle the OAuth2 authorization process
-# flow = Flow.from_client_secrets_file(
-#     credentials_file, scopes=SCOPES,
-#     redirect_uri= "https://127.0.0.1:8000/apiV1/callback/")
-
-# @api_view(['POST'])
-# def create_event(request):
-#     # Load the credentials from the request header
-#     import pdb; pdb.set_trace()
-
-#     creds = Credentials.from_authorized_user_info({'access_token': 'ya29.a0AVvZVsq5PX57z11aI_qpG03nmXDqS_PIzGy0Ah_ZwVLRp4WJcDG6dkmEp9lww2-1XsenjWOD7Vp3pYh74dtZi9q3WO1lNUUcVLNIHy0QDYClrtK6ViFIG1FIxe46G3qbApFE50IZSSYNivbR6Ufi6FVDsIhvaCgYKAYcSARESFQGbdwaI_22EWLbqXgmlUrxb4YaT9A0163'})
-#     # Create a service object to access the Google Calendar API
-#     service = build('calendar', 'v3', credentials=creds)
-#     # Set the start and end times of the event
-#     start_time = datetime.now()
-#     end_time = start_time + timedelta(hours=1)
-#     # Create a new event on the user's calendar
-#     event = {
-#         'summary': 'New Event',
-#         'location': 'San Francisco, CA',
-#         'description': 'A new event',
-#         'start': {
-#             'dateTime': start_time.strftime('%Y-%m-%dT%H:%M:%S'),
-#             'timeZone': 'America/Los_Angeles',
-#         },
-#         'end': {
-#             'dateTime': end_time.strftime('%Y-%m-%dT%H:%M:%S'),
-#             'timeZone': 'America/Los_Angeles',
-#         },
-#         'reminders': {
-#             'useDefault': True,
-#         },
-#     }
-#     calendar_id = 'primary'
-#     event = service.events().insert(calendarId=calendar_id, body=event).execute()
-#     return Response({'message': f'Event created: {event.get("htmlLink")}'})
-
-
-# class callApi(APIView):
-#     # permission_classes = (permissions.AllowAny, )
-    
-#     def get(self, request, format=None):
-#         import requests
-
-#         access_token = 'ya29.a0AVvZVsqheRE6CZsFHx-0U2Z3EoZO40jtRkyFhfiFPS65BoBRz1K0rxVMsG3KvRuwNB5R4BxLMH5WlrND0Scf8OLGg12USeqDk5dh0jv_lOGE18BXAe56p6KiOvQwmM9Rt9qZCZYAPjdS8ajytFUFhzINgGxyaCgYKAb4SARESFQGbdwaIguQy-WvjlillJpx6YIf5nw0163'
-
-#         headers = {
-#             'Authorization': f'Bearer {access_token}',
-#             'host': 'www.googleapis.com'
-#         }
-
-#         response = requests.post('http://localhost:8000/apiV1/create-event/', headers=headers)
-
-#         return Response(response.json())
