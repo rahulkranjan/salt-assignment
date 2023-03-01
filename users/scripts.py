@@ -140,8 +140,6 @@ class CreateMeet(APIView):
 
 from rest_framework import filters, permissions, status
 from django.urls import reverse
-
-uri = "https://web-production-df525.up.railway.app/apiV1/callback/"
 class GoogleAuthView(APIView):
     permission_classes = (permissions.AllowAny, )
     def get(self, request, format=None):
@@ -151,7 +149,7 @@ class GoogleAuthView(APIView):
         flow = InstalledAppFlow.from_client_config(
             client_secret,
             scopes=['https://www.googleapis.com/auth/calendar'],
-            redirect_uri=uri,
+            redirect_uri=request.build_absolute_uri(reverse('google_oauth_callback')),
         )
         authorization_url, state = flow.authorization_url(
             access_type='offline',
@@ -174,23 +172,22 @@ class GoogleAuthCallback(APIView):
             scopes=[
                 'https://www.googleapis.com/auth/calendar'
             ],
-            redirect_uri=uri,)
+            redirect_uri=request.build_absolute_uri(reverse('google_oauth_callback')),)
         access_token = flow.fetch_token(code=code)
+        print(access_token)
 
         final = {
-            'token': access_token['access_token'],
-            'refresh_token': access_token['refresh_token'],
-            "token_uri": "https://oauth2.googleapis.com/token",
-            "client_id": "7065572801-kj0pp2ce2ti9hlju4raj4o51a5a26cns.apps.googleusercontent.com",
-            "client_secret": "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", 
+            "client_id": "7065572801-5dgrf6n7k2qqsqq57rbmmm9qg7jcptqo.apps.googleusercontent.com",
+            "client_secret": "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",
+            "expiry": "2023-03-27T09:02:14.758344Z",
+            "refresh_token": access_token['refresh_token'],
             "scopes": [
                 "https://www.googleapis.com/auth/calendar"
             ],
-            "expiry_date": datetime.fromtimestamp(access_token['expires_at'])
-
+            "token": access_token['access_token'],
+            "token_uri": "https://oauth2.googleapis.com/token"
         }
-        data.token = final
+        data.token = json.dumps(final)
         data.save()
-        from django.shortcuts import render
-        return Response(render(request, 'template/thankyou.html'))
+        return Response(access_token)
     
