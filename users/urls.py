@@ -11,6 +11,7 @@ urlpatterns = [
     path('create-meet/', CreateMeet.as_view()),
     path('google-oauth/', GoogleAuthView.as_view(), name='google_oauth'),
     path('callback/', GoogleAuthCallback.as_view(), name='google_oauth_callback'),
+    path('automation/', Automation.as_view()),
 
     # path('create-event/', create_event),
 ]

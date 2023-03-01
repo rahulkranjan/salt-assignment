@@ -12,6 +12,15 @@ import json
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
+from selenium import webdriver
+import time
+from selenium import webdriver
+from selenium.webdriver.common.action_chains import ActionChains
+
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+
+
 from users.models import GmeetConfig
 
 sys.path.append("../..")
@@ -198,3 +207,109 @@ class GoogleAuthCallback(APIView):
 
         return Response({'message': 'Authentication successful', 'access_token': final})
         #in response we show html file or redirect to our homepage insteed of this
+
+
+class Automation(APIView):
+    def get(self, request, format=None):
+        options = webdriver.ChromeOptions()
+        options.add_experimental_option('excludeSwitches', ['enable-logging'])
+
+        browser1 = webdriver.Chrome(options=options)
+        ID = "id"
+        NAME = "name"
+        CLASS_NAME = "class"
+        TAG_NAME = "input"
+        XPATH = "xpath"
+        browser1.get(
+            'https://console.cloud.google.com/')
+
+        # email = browser1.find_elements(
+        #     By.XPATH, "//*[@id='identifierId']")
+        # email[0].send_keys('rahul.ranjan@orchids.edu.in')
+
+
+        # button = browser1.find_elements(
+        #     By.XPATH, '//*[@id="identifierNext"]/div/button')
+
+        # button[0].click()
+
+        # time.sleep(10)
+        # password = browser1.find_elements(
+        #     By.XPATH, '//*[@id="password"]/div[1]/div/div[1]/input')
+        # password[0].send_keys('thinkranjan@1000')
+
+        # button = browser1.find_elements(
+        #     By.XPATH, '//*[@id="passwordNext"]/div/button')
+        # button[0].click()
+
+
+        time.sleep(60)
+        # element = browser1.find_elements(By.XPATH, '//*[@id="pcc-purview-switcher"]/pcc-platform-bar-purview-switcher/pcc-purview-switcher/cfc-switcher-button/button')
+        element = browser1.find_elements(By.XPATH, '//*[contains(@id,"pcc-purview-switcher")]')
+        element[0].click()
+
+        time.sleep(2)
+
+        # project = browser1.find_elements(
+        #     By.XPATH, '//*[@id="mat-dialog-0"]/ng-component/div[1]/mat-toolbar/mat-toolbar-row[1]/div[2]/button[1]')
+        # project[0].click()
+        # time.sleep(30)
+
+        # project = browser1.find_elements(
+        #     By.XPATH, '//*[@id="p6ntest-name-input"]')
+        # project[0].send_keys('Orchids Gmeet')
+        # button = browser1.find_elements(
+        #     By.XPATH, '//*[@id="p6ntest-project-create-page"]/cfc-panel-body/cfc-virtual-viewport/div[1]/div/proj-creation-form/form/button[1]')
+        # button[0].click()
+
+        # time.sleep(10)
+
+        # project = browser1.find_elements(
+        #     By.XPATH, '//*[@id="mat-dialog-0"]/ng-component/div[1]/mat-toolbar/mat-toolbar-row[1]/div[2]/button[1]')
+        # project[0].click()
+
+        # time.sleep(20)
+
+        project = browser1.find_elements(
+            By.XPATH, '//*[@id="cfc-table-caption-0-row-0"]/td[4]')
+
+        project[0].click()
+
+        click = browser1.find_elements(
+            By.XPATH, '//*[@id="mat-dialog-0"]/ng-component/div[2]/button[2]/span[2]')
+
+
+        click[0].click()
+
+        time.sleep(2)
+
+        api_and_services = browser1.find_elements(
+            By.XPATH, "//*[@class='quick-access-grid']/a[1]")
+
+        print(api_and_services)
+
+        api_and_services[0].click()
+
+        time.sleep(5)
+
+        enable_api_and_services = browser1.find_elements(
+            By.XPATH, '//*[@id="_2rif_default-action-bar"]/mat-toolbar/div[3]/div/div/div[1]/div/a/span[2]')
+
+        enable_api_and_services[0].click()
+
+        time.sleep(10)
+
+        search = browser1.find_element(By.XPATH, '//*[@id="_3rif_mat-input-0"]')
+        actions = ActionChains(browser1)
+        actions.move_to_element(search).click().send_keys("calender").send_keys(Keys.RETURN).perform()
+
+
+        # select_calender = browser1.find_elements(
+        #     By.XPATH, '')
+
+        # select_calender[0].click()
+
+
+        time.sleep(10)
+        browser1.close()
+        return Response({'message': 'Automation successful'})
