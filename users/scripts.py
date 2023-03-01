@@ -136,20 +136,22 @@ class CreateMeet(APIView):
         calendar = GoogleCalendar(tutor_id, start_time, end_time,summary, location,description, attendees)
         result = calendar.create_event(start_time,end_time)
         return Response(result)
-
-
+    
 from rest_framework import filters, permissions, status
-from django.urls import reverse
+
+uri=  'https://web-production-df525.up.railway.app/apiV1/callback/'
+
 class GoogleAuthView(APIView):
     permission_classes = (permissions.AllowAny, )
     def get(self, request, format=None):
+        tutor_id = self.request.query_params.get('tutor_id', None)
         # Set up the Google OAuth2 flow
         data = GmeetConfig.objects.get(tutor_id=2)
         client_secret = eval(data.credentials)
         flow = InstalledAppFlow.from_client_config(
             client_secret,
             scopes=['https://www.googleapis.com/auth/calendar'],
-            redirect_uri=request.build_absolute_uri(reverse('google_oauth_callback')),
+            redirect_uri=uri,
         )
         authorization_url, state = flow.authorization_url(
             access_type='offline',
@@ -160,10 +162,11 @@ class GoogleAuthView(APIView):
 
         # Redirect the user to the Google OAuth consent screen
         return Response({'url': authorization_url})
-
+    
 class GoogleAuthCallback(APIView):
     permission_classes = (permissions.AllowAny, )
     def get(self, request, format=None):
+        tutor_id = self.request.query_params.get('tutor_id', None)
         data = GmeetConfig.objects.get(tutor_id=2)
         client_secret = eval(data.credentials)
         code = self.request.query_params.get('code', None)
@@ -172,14 +175,17 @@ class GoogleAuthCallback(APIView):
             scopes=[
                 'https://www.googleapis.com/auth/calendar'
             ],
-            redirect_uri=request.build_absolute_uri(reverse('google_oauth_callback')),)
+            redirect_uri=uri,
+            )
         access_token = flow.fetch_token(code=code)
-        print(access_token)
+
+
+        print(client_secret['web']['client_id'])
 
         final = {
-            "client_id": "7065572801-5dgrf6n7k2qqsqq57rbmmm9qg7jcptqo.apps.googleusercontent.com",
-            "client_secret": "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",
-            "expiry": "2023-03-27T09:02:14.758344Z",
+            "client_id": client_secret['web']['client_id'],
+            "client_secret": client_secret['web']['client_secret'],
+            "expiry": "2028-03-27T09:02:14.758344Z",
             "refresh_token": access_token['refresh_token'],
             "scopes": [
                 "https://www.googleapis.com/auth/calendar"
@@ -189,5 +195,6 @@ class GoogleAuthCallback(APIView):
         }
         data.token = json.dumps(final)
         data.save()
-        return Response(access_token)
-    
+
+        return Response({'message': 'Authentication successful', 'access_token': final})
+        #in response we show html file or redirect to our homepage insteed of this
