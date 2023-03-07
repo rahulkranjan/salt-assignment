@@ -23,5 +23,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('apiV1/', include('users.urls')),
+    path('apiV1/', include('bucketlist.urls')),
 
 ]

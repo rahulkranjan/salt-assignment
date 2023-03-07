@@ -16,14 +16,14 @@ class BucketList(APIView):
     """
     permission_classes = (permissions.AllowAny,)
     def get(self, request, format=None):
-        bucketlists = Bucket.objects.filter(user=request.user)
+        bucketlists = Bucket.objects.filter()
         serializer = BucketSerializer(bucketlists, many=True)
         return Response(serializer.data)
 
     def post(self, request, format=None):
         serializer = BucketSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(user=request.user)
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
