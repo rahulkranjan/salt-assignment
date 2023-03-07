@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_filters',
     'users',
+    'bucketlist',
     # 'sslserver',
 ]
 
